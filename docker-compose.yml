@@ -1,0 +1,35 @@
+services:
+
+  # ============================================================
+  # API Node.js — WhatsApp + banco de dados SQLite
+  # ============================================================
+  api:
+    build: .
+    container_name: whatsapp_api
+    ports:
+      - "3000:3000"
+    volumes:
+      # Monta o projeto inteiro para persistir o banco e a sessão do WhatsApp
+      - .:/app
+      # Exclui node_modules do host para não sobrescrever os do container
+      - /app/node_modules
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  # ============================================================
+  # Frontend PHP — Painel administrativo
+  # ============================================================
+  frontend:
+    build: ./frontend
+    container_name: whatsapp_frontend
+    ports:
+      - "8080:80"
+    environment:
+      # Dentro do Docker, "localhost" é o próprio container.
+      # O nome "api" aponta para o serviço Node.js acima.
+      - API_URL=http://api:3000
+      - API_KEY=${API_KEY}
+    depends_on:
+      - api
+    restart: unless-stopped

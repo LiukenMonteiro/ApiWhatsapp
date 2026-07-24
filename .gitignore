@@ -1,0 +1,7 @@
+node_modules/
+auth/
+.env
+laboratorio.db
+laboratorio.db-shm
+laboratorio.db-wal
+.claude/

@@ -1,4 +1,5 @@
-FROM php:8.2-apache
+FROM php:8.2-apache 
+# APENAS ORTOGRÁFICO
 
 # Instala e ativa a extensão cURL (necessária para chamar a API Node.js)
 RUN apt-get update \

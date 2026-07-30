@@ -16,7 +16,7 @@ body {
 }
 
 .container {
-  max-width: 960px;
+  max-width: 980px;
   margin: 0 auto;
 }
 
@@ -35,6 +35,12 @@ body {
   color: #1a1a2e;
 }
 
+.cabecalho-status {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .status-badge {
   padding: 6px 14px;
   border-radius: 20px;
@@ -50,6 +56,7 @@ body {
   display: flex;
   gap: 4px;
   margin-bottom: 0;
+  flex-wrap: wrap;
 }
 
 .aba {
@@ -102,7 +109,7 @@ body {
   gap: 0 18px;
 }
 
-.campo-largo { grid-column: span 2; }  /* ocupa as 2 colunas */
+.campo-largo { grid-column: span 2; }
 .campo-curto { max-width: 140px; }
 
 /* Campos de formulário */
@@ -195,6 +202,7 @@ body {
   font-size: 0.9rem;
   font-weight: 600;
   transition: opacity 0.2s, transform 0.1s;
+  text-align: center;
 }
 
 .btn:hover  { opacity: 0.88; }
@@ -206,6 +214,27 @@ body {
 .btn-amarelo    { background: #ffc107; color: #333; font-size: 0.82rem; padding: 6px 12px; }
 .btn-azul       { background: #4a90e2; color: #fff; font-size: 0.82rem; padding: 6px 12px; text-decoration: none; display: inline-block; }
 .btn-vermelho   { background: #dc3545; color: #fff; font-size: 0.82rem; padding: 6px 12px; }
+.btn-link       { background: transparent; color: #888; font-size: 0.82rem; padding: 6px 8px; text-decoration: underline; }
+
+/* Formulário inline nas ações da tabela */
+.form-acao {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Select de instância dentro das ações */
+.select-instancia {
+  padding: 5px 6px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #333;
+  background: #f8f9fa;
+  cursor: pointer;
+  height: 30px;
+}
 
 /* Tabela de resultados */
 .tabela-contatos {
@@ -236,6 +265,7 @@ body {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .sem-resultado {
@@ -244,12 +274,95 @@ body {
   margin-top: 12px;
 }
 
+/* ============================================================
+   WhatsApp — Cards de conexão
+============================================================ */
+
+.whatsapp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.wa-card {
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 20px;
+  background: #fafbfc;
+  transition: border-color 0.2s;
+}
+
+.wa-card:hover { border-color: #c8cdd3; }
+
+.wa-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.wa-titulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.wa-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.wa-badge.badge-ok     { background: #d4edda; color: #155724; }
+.wa-badge.badge-aguard { background: #fff3cd; color: #856404; }
+.wa-badge.badge-off    { background: #f8d7da; color: #721c24; }
+
+.wa-acoes {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* QR Code */
+.wa-qr-area {
+  margin-top: 16px;
+  text-align: center;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+}
+
+.wa-qr-instrucao {
+  font-size: 0.82rem;
+  color: #555;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.wa-qr-img {
+  max-width: 200px;
+  width: 100%;
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto 10px;
+}
+
+.wa-qr-aviso {
+  font-size: 0.75rem;
+  color: #aaa;
+}
+
 /* Responsivo */
-@media (max-width: 620px) {
-  .grade-2 { grid-template-columns: 1fr; }
-  .campo-largo { grid-column: span 1; }
-  .campo-busca { flex-direction: column; }
-  .tabela-contatos { font-size: 0.8rem; }
-  .acoes { flex-direction: column; }
-  .rodape-form { flex-direction: column; gap: 12px; }
+@media (max-width: 680px) {
+  .grade-2          { grid-template-columns: 1fr; }
+  .campo-largo      { grid-column: span 1; }
+  .campo-busca      { flex-direction: column; }
+  .tabela-contatos  { font-size: 0.8rem; }
+  .acoes            { flex-direction: column; }
+  .rodape-form      { flex-direction: column; gap: 12px; }
+  .whatsapp-grid    { grid-template-columns: 1fr; }
 }

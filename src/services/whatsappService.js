@@ -1,5 +1,5 @@
 // ============================================================
-// whatsappService.js — Camada de envio de mensagens WhatsApp
+// whatsappService.js — Suporte a múltiplas instâncias WhatsApp
 // ============================================================
 
 const {
@@ -8,26 +8,40 @@ const {
   DisconnectReason,
   fetchLatestBaileysVersion,
 } = require('@whiskeysockets/baileys');
-const qrcode = require('qrcode-terminal');
+const QRCode = require('qrcode');
 const pino   = require('pino');
 const path   = require('path');
+const fs     = require('fs');
 
-let sock      = null;
-let conectado = false;
-let tentativas = 0;
 const MAX_TENTATIVAS = 5;
 
-async function iniciarConexao() {
-  const { state, saveCreds } = await useMultiFileAuthState(
-    path.join(__dirname, '../../auth')
-  );
+// Map id -> { sock, conectado, qrCode, tentativas, bloqueado }
+const instances = new Map();
 
-  // Busca a versão atual do WhatsApp Web — evita o erro 405
-  // que acontece quando o Baileys usa uma versão desatualizada
+function getInst(id) {
+  if (!instances.has(id)) {
+    instances.set(id, { sock: null, conectado: false, qrCode: null, tentativas: 0, bloqueado: false });
+  }
+  return instances.get(id);
+}
+
+function authDir(id) {
+  // Instância 1 usa auth/ (compatibilidade com versão anterior)
+  // Instância 2 usa auth2/
+  return id === '1'
+    ? path.join(__dirname, '../../auth')
+    : path.join(__dirname, `../../auth${id}`);
+}
+
+async function iniciarConexao(id = '1') {
+  const inst = getInst(id);
+  if (inst.sock || inst.bloqueado) return; // já em execução ou aguardando ação manual
+
+  const { state, saveCreds } = await useMultiFileAuthState(authDir(id));
   const { version } = await fetchLatestBaileysVersion();
-  console.log(`📡 Usando WhatsApp Web versão: ${version.join('.')}`);
+  console.log(`📡 [WhatsApp ${id}] Versão Web: ${version.join('.')}`);
 
-  sock = makeWASocket({
+  const sock = makeWASocket({
     version,
     auth:            state,
     logger:          pino({ level: 'silent' }),
@@ -35,60 +49,111 @@ async function iniciarConexao() {
     syncFullHistory: false,
   });
 
+  inst.sock = sock;
+
   sock.ev.on('creds.update', saveCreds);
 
-  sock.ev.on('connection.update', (update) => {
+  sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect, qr } = update;
-
-    // Só loga mudanças relevantes: QR, conectou, desconectou
     if (!qr && !connection) return;
 
     if (qr) {
-      tentativas = 0;
-      console.log('\n📱 Escaneie o QR Code abaixo com o WhatsApp Business:\n');
-      qrcode.generate(qr, { small: true });
+      inst.tentativas = 0;
+      inst.qrCode = await QRCode.toDataURL(qr);
+      console.log(`📱 [WhatsApp ${id}] QR Code gerado.`);
     }
 
     if (connection === 'open') {
-      tentativas = 0;
-      conectado  = true;
-      console.log('✅ WhatsApp conectado!');
+      inst.tentativas = 0;
+      inst.conectado  = true;
+      inst.qrCode     = null;
+      console.log(`✅ [WhatsApp ${id}] Conectado!`);
     }
 
     if (connection === 'close') {
-      conectado = false;
+      inst.conectado = false;
+      inst.sock      = null;
 
-      const erro       = lastDisconnect?.error;
-      const codigoErro = erro?.output?.statusCode;
+      const codigoErro = lastDisconnect?.error?.output?.statusCode;
 
       if (codigoErro === DisconnectReason.loggedOut) {
-        console.log('❌ Logout. Delete a pasta /auth e reinicie para reconectar.');
+        console.log(`❌ [WhatsApp ${id}] Deslogado. Reconecte pelo painel.`);
+        inst.bloqueado = true; // impede reconexão automática por timeouts pendentes
         return;
       }
 
-      tentativas++;
-      if (tentativas >= MAX_TENTATIVAS) {
-        console.log('❌ Não conseguiu conectar após várias tentativas. Reinicie o servidor.');
+      inst.tentativas++;
+      if (inst.tentativas >= MAX_TENTATIVAS) {
+        console.log(`❌ [WhatsApp ${id}] Falha ao conectar. Tente novamente pelo painel.`);
+        instances.delete(id);
         return;
       }
 
-      console.log(`⚠️  Conexão perdida — reconectando (${tentativas}/${MAX_TENTATIVAS})...`);
-      setTimeout(iniciarConexao, 5000);
+      console.log(`⚠️  [WhatsApp ${id}] Reconectando (${inst.tentativas}/${MAX_TENTATIVAS})...`);
+      setTimeout(() => iniciarConexao(id), 5000);
     }
   });
 }
 
-async function enviarMensagem(numero, texto) {
-  if (!conectado || !sock) {
-    throw new Error('WhatsApp não está conectado.');
+
+async function resetarInstancia(id) {
+  const inst = instances.get(id);
+  if (!inst) return;
+  if (inst.sock) {
+    try { inst.sock.ev.removeAllListeners(); } catch (_) {}
+    try { inst.sock.ws?.close(); } catch (_) {}
+    inst.sock = null;
   }
-  const numeroFormatado = numero.replace(/\D/g, '') + '@s.whatsapp.net';
-  await sock.sendMessage(numeroFormatado, { text: texto });
+  instances.delete(id); // cria estado limpo na próxima chamada a getInst()
+}
+
+async function desconectar(id = '1') {
+  const inst = instances.get(id);
+  if (!inst) return;
+  if (inst.sock) {
+    try { await inst.sock.logout(); } catch (_) {}
+    inst.sock = null;
+  }
+  instances.delete(id);
+}
+
+async function enviarMensagem(id = '1', numero, texto) {
+  const inst = instances.get(id);
+  if (!inst?.conectado || !inst.sock) {
+    throw new Error(`WhatsApp ${id} não está conectado.`);
+  }
+  const jid = numero.replace(/\D/g, '') + '@s.whatsapp.net';
+  await inst.sock.sendMessage(jid, { text: texto });
   return true;
 }
 
-function obterStatus() {
-  return { conectado };
+function obterStatus(id = '1') {
+  const inst = instances.get(id);
+  return {
+    conectado:    inst?.conectado ?? false,
+    aguardandoQR: !!(inst?.qrCode && !inst?.conectado),
+    iniciado:     !!(inst?.sock),
+  };
 }
 
-module.exports = { iniciarConexao, enviarMensagem, obterStatus };
+function obterQRCode(id = '1') {
+  return instances.get(id)?.qrCode ?? null;
+}
+
+async function iniciarTodasConexoes() {
+  // Só tenta reconectar instâncias que já têm sessão salva
+  const tarefas = ['1', '2']
+    .filter(id => fs.existsSync(authDir(id)))
+    .map(id => iniciarConexao(id));
+  if (tarefas.length) await Promise.allSettled(tarefas);
+}
+
+module.exports = {
+  iniciarConexao,
+  iniciarTodasConexoes,
+  enviarMensagem,
+  obterStatus,
+  obterQRCode,
+  resetarInstancia,
+  desconectar,
+};

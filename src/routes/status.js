@@ -1,25 +1,24 @@
 // ============================================================
-// routes/status.js — Rota de status da conexão WhatsApp
-// ============================================================
-// Em Express, "Router" é como um agrupador de rotas.
-// É parecido com um "controller" no Laravel/CodeIgniter.
+// routes/status.js — Status das instâncias WhatsApp
 // ============================================================
 
-const express = require('express');
-const router  = express.Router();
+const express         = require('express');
+const router          = express.Router();
 const whatsappService = require('../services/whatsappService');
 
-// GET /status — retorna se o WhatsApp está conectado
-// "req" = request (dados que chegaram), "res" = response (o que vamos devolver)
+// GET /status
 router.get('/', (req, res) => {
-  const status = whatsappService.obterStatus();
+  const s1 = whatsappService.obterStatus('1');
+  const s2 = whatsappService.obterStatus('2');
 
   return res.json({
-    sucesso: true,
-    conectado: status.conectado,
-    mensagem: status.conectado
-      ? 'WhatsApp conectado e pronto para enviar mensagens.'
-      : 'WhatsApp desconectado. Verifique o QR Code no terminal.'
+    sucesso:    true,
+    conectado:  s1.conectado, // compatibilidade com versão anterior
+    instancia1: s1,
+    instancia2: s2,
+    mensagem:   s1.conectado
+      ? 'WhatsApp 1 conectado e pronto para enviar mensagens.'
+      : 'WhatsApp 1 desconectado. Acesse a aba WhatsApp para conectar.',
   });
 });
 

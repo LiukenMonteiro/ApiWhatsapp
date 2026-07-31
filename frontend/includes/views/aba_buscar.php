@@ -1,3 +1,20 @@
+<?php
+/**
+ * includes/views/aba_buscar.php
+ *
+ * View da aba "Buscar" — permite pesquisar pacientes pelo nome.
+ * Exibe um campo de busca e, após o envio, lista os resultados encontrados
+ * ou uma mensagem caso nenhum paciente seja encontrado.
+ * A busca só é executada com ao menos 2 caracteres (validado em data_loader.php).
+ *
+ * Variáveis esperadas do escopo global:
+ *   $termo_busca           → string com o termo digitado pelo usuário
+ *   $pacientes_encontrados → array com os pacientes retornados pela busca
+ *
+ * Funções utilizadas: renderizarTabela() — definida em includes/helpers.php
+ * Incluído em: index.php
+ */
+?>
 <section class="card">
   <h2>Buscar Paciente</h2>
   <form method="GET" action="">

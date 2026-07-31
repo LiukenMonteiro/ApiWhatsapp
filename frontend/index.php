@@ -1,9 +1,19 @@
 <?php
-require_once 'config.php';
-require_once 'includes/helpers.php';
-require_once 'includes/ajax_proxy.php';
-require_once 'includes/form_actions.php';
-require_once 'includes/data_loader.php';
+require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/includes/helpers.php';
+require_once __DIR__ . '/includes/ajax_proxy.php';
+require_once __DIR__ . '/includes/form_actions.php';
+require_once __DIR__ . '/includes/data_loader.php';
+
+/** @var string $aba_ativa */
+/** @var array  $whatsapp1 */
+/** @var array  $whatsapp2 */
+/** @var string $mensagem_feedback */
+/** @var string $tipo_feedback */
+/** @var array  $todos_pacientes */
+/** @var string $termo_busca */
+/** @var array  $pacientes_encontrados */
+/** @var array|null $paciente_editar */
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -17,18 +27,18 @@ require_once 'includes/data_loader.php';
 
 <div class="container">
 
-  <?php require 'includes/views/header.php'; ?>
+  <?php require __DIR__ . '/includes/views/header.php'; ?>
 
-  <?php if ($aba_ativa === 'todos'):     require 'includes/views/aba_todos.php';
-  elseif ($aba_ativa === 'buscar'):      require 'includes/views/aba_buscar.php';
-  elseif ($aba_ativa === 'cadastrar'):   require 'includes/views/aba_cadastrar.php';
-  elseif ($aba_ativa === 'editar'):      require 'includes/views/aba_editar.php';
-  elseif ($aba_ativa === 'whatsapp'):    require 'includes/views/aba_whatsapp.php';
+  <?php if ($aba_ativa === 'todos'):          require __DIR__ . '/includes/views/aba_todos.php';
+  elseif ($aba_ativa === 'buscar'):           require __DIR__ . '/includes/views/aba_buscar.php';
+  elseif ($aba_ativa === 'cadastrar'):        require __DIR__ . '/includes/views/aba_cadastrar.php';
+  elseif ($aba_ativa === 'editar'):           require __DIR__ . '/includes/views/aba_editar.php';
+  elseif ($aba_ativa === 'whatsapp'):         require __DIR__ . '/includes/views/aba_whatsapp.php';
   endif; ?>
 
 </div>
 
-<?php if ($aba_ativa === 'whatsapp'): require 'includes/views/whatsapp_js.php'; endif; ?>
+<?php if ($aba_ativa === 'whatsapp'): require __DIR__ . '/includes/views/whatsapp_js.php'; endif; ?>
 
 </body>
 </html>

@@ -1,4 +1,22 @@
 <?php
+/**
+ * includes/helpers.php
+ *
+ * Funções auxiliares de renderização de HTML reutilizadas em múltiplas views.
+ *
+ * Funções disponíveis:
+ *   - renderizarTabela(array $pacientes, string $origem): string
+ *       Gera a tabela HTML de pacientes com botões de ação
+ *       (enviar exame, pesquisa, editar, excluir).
+ *       $origem indica de qual aba a ação foi disparada para redirecionar corretamente.
+ *
+ *   - renderizarFormulario(string $modo, ?array $p): string
+ *       Gera o formulário de cadastro ou edição de paciente.
+ *       $modo = 'cadastrar' → formulário em branco
+ *       $modo = 'editar'    → formulário pré-preenchido com os dados de $p
+ *
+ * Incluído em: index.php (antes das views)
+ */
 function renderizarTabela(array $pacientes, string $origem): string {
   $html = '<table class="tabela-contatos"><thead><tr>
     <th>Nome</th><th>WhatsApp</th><th>Cidade</th><th>Observação</th><th>Ações</th>

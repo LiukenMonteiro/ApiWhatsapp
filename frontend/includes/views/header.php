@@ -1,3 +1,21 @@
+<?php
+/**
+ * includes/views/header.php
+ *
+ * View parcial do cabeçalho da página.
+ * Exibe o título, os badges de status das instâncias WhatsApp,
+ * o alerta de feedback das ações POST e a barra de navegação entre abas.
+ *
+ * Variáveis esperadas do escopo global:
+ *   $whatsapp1         → array com chave 'conectado' (bool)
+ *   $whatsapp2         → array com chave 'conectado' (bool)
+ *   $mensagem_feedback → string com a mensagem de retorno da última ação
+ *   $tipo_feedback     → 'sucesso' | 'erro'
+ *   $aba_ativa         → aba atual para destacar o link ativo
+ *
+ * Incluído em: index.php
+ */
+?>
 <header class="cabecalho">
   <h1>Painel WhatsApp — Laboratório</h1>
   <div class="cabecalho-status">

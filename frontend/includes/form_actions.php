@@ -1,4 +1,20 @@
 <?php
+/**
+ * includes/form_actions.php
+ *
+ * Processa todas as ações enviadas via formulário (método POST).
+ * Define as variáveis globais $mensagem_feedback e $tipo_feedback
+ * que são exibidas no cabeçalho da página após cada ação.
+ *
+ * Ações tratadas:
+ *   - cadastrar          → cria um novo paciente via API
+ *   - atualizar          → atualiza os dados de um paciente existente
+ *   - excluir            → remove um paciente pelo ID
+ *   - exame_pronto       → envia mensagem WhatsApp de exame pronto
+ *   - pesquisa_satisfacao → envia mensagem WhatsApp de pesquisa
+ *
+ * Incluído em: index.php
+ */
 function coletarCamposFormulario(): array {
   return [
     'nome_completo'   => trim($_POST['nome_completo']   ?? ''),

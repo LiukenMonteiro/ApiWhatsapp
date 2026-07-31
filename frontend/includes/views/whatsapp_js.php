@@ -1,3 +1,22 @@
+<?php
+/**
+ * includes/views/whatsapp_js.php
+ *
+ * JavaScript de gerenciamento das instâncias WhatsApp.
+ * Carregado apenas quando a aba "WhatsApp" está ativa.
+ *
+ * Responsabilidades:
+ *   - Consultar o status de cada instância a cada 3 segundos (polling)
+ *   - Atualizar os badges e botões de acordo com o estado (conectado, aguardando QR, desconectado)
+ *   - Buscar e exibir o QR Code quando a instância está aguardando conexão
+ *   - Iniciar e encerrar conexões via botões
+ *
+ * Todas as chamadas ao backend são feitas via fetch() para includes/ajax_proxy.php
+ * usando o parâmetro GET "ajax_action".
+ *
+ * Incluído em: index.php (apenas quando $aba_ativa === 'whatsapp')
+ */
+?>
 <script>
 const POLL_INTERVAL = 3000;
 const polls = {};

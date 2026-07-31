@@ -1,3 +1,18 @@
+<?php
+/**
+ * includes/views/aba_whatsapp.php
+ *
+ * View da aba "WhatsApp" — gerenciamento das duas instâncias WhatsApp.
+ * Renderiza os cards de cada instância (1 e 2) com área para QR Code e botões de ação.
+ * O conteúdo dos cards (status, botões, QR) é preenchido dinamicamente pelo JavaScript
+ * via chamadas AJAX ao proxy definido em includes/ajax_proxy.php.
+ *
+ * O JavaScript responsável pela lógica de polling e interação
+ * está separado em includes/views/whatsapp_js.php.
+ *
+ * Incluído em: index.php (apenas quando $aba_ativa === 'whatsapp')
+ */
+?>
 <section class="card">
   <h2>Conexões WhatsApp</h2>
   <p style="color:#666;font-size:0.88rem;margin-bottom:20px">

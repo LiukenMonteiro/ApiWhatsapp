@@ -1,4 +1,22 @@
 <?php
+/**
+ * includes/data_loader.php
+ *
+ * Carrega os dados necessários para cada aba antes de renderizar a view.
+ * Determina qual aba está ativa e consulta a API apenas para os dados
+ * necessários àquela aba (evita chamadas desnecessárias).
+ *
+ * Variáveis exportadas para o escopo global (usadas pelas views):
+ *   $whatsapp1            → status da instância 1 do WhatsApp
+ *   $whatsapp2            → status da instância 2 do WhatsApp
+ *   $aba_ativa            → aba atual: 'todos' | 'buscar' | 'cadastrar' | 'editar' | 'whatsapp'
+ *   $todos_pacientes      → lista de pacientes (apenas na aba 'todos')
+ *   $termo_busca          → termo digitado na busca (apenas na aba 'buscar')
+ *   $pacientes_encontrados → resultado da busca (apenas na aba 'buscar')
+ *   $paciente_editar      → dados do paciente a editar (apenas na aba 'editar')
+ *
+ * Incluído em: index.php
+ */
 $status    = chamarApi('GET', '/status');
 $whatsapp1 = $status['instancia1'] ?? ['conectado' => false];
 $whatsapp2 = $status['instancia2'] ?? ['conectado' => false];

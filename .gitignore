@@ -1,5 +1,6 @@
 node_modules/
 auth/
+auth2/
 .env
 laboratorio.db
 laboratorio.db-shm
